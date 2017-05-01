@@ -10,4 +10,3 @@ import:
 - package: golang.org/x/net
   subpackages:
   - context
-  - context/ctxhttp
