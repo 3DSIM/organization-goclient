@@ -7,74 +7,154 @@ import (
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
 )
 
-// Organization An organization represents a single entity that contains a group of users
+// Organization organization
 // swagger:model organization
 type Organization struct {
+
+	// accepted at
+	AcceptedAt strfmt.DateTime `json:"acceptedAt,omitempty"`
+
+	// accepted by
+	// Max Length: 64
+	AcceptedBy string `json:"acceptedBy,omitempty"`
 
 	// active
 	// Required: true
 	Active *bool `json:"active"`
 
+	// address line1
+	// Required: true
+	// Max Length: 210
+	// Min Length: 0
+	AddressLine1 *string `json:"addressLine1"`
+
+	// address line2
+	// Max Length: 210
+	// Min Length: 0
+	AddressLine2 *string `json:"addressLine2,omitempty"`
+
+	// address line3
+	// Max Length: 210
+	// Min Length: 0
+	AddressLine3 *string `json:"addressLine3,omitempty"`
+
 	// city
 	// Required: true
+	// Max Length: 50
+	// Min Length: 0
 	City *string `json:"city"`
 
-	// created UTC time stamp, set server-side, read only field
-	Created strfmt.DateTime `json:"created,omitempty"`
+	// country
+	// Required: true
+	// Max Length: 50
+	// Min Length: 0
+	Country *string `json:"country"`
 
-	// creating user, set server-side, read only field
+	// created at
+	CreatedAt strfmt.DateTime `json:"createdAt,omitempty"`
+
+	// created by
+	// Max Length: 64
 	CreatedBy string `json:"createdBy,omitempty"`
 
 	// free trial hours
-	FreeTrialHours int64 `json:"freeTrialHours,omitempty"`
+	// Required: true
+	FreeTrialHours *int32 `json:"freeTrialHours"`
 
-	// ID of organization
-	ID int64 `json:"id,omitempty"`
+	// id
+	ID int32 `json:"id,omitempty"`
 
-	// last modified UTC time stamp, set server-side, read only field
-	LastModified strfmt.DateTime `json:"lastModified,omitempty"`
+	// last modified at
+	LastModifiedAt strfmt.DateTime `json:"lastModifiedAt,omitempty"`
 
-	// modifying user, set server-side, read only field
+	// last modified by
+	// Max Length: 64
 	LastModifiedBy string `json:"lastModifiedBy,omitempty"`
 
-	// name of organization
+	// name
 	// Required: true
+	// Max Length: 100
+	// Min Length: 0
 	Name *string `json:"name"`
 
 	// postal code
 	// Required: true
+	// Max Length: 50
+	// Min Length: 0
 	PostalCode *string `json:"postalCode"`
-
-	// id of product this organization is signed up for
-	// Required: true
-	ProductID *int64 `json:"productId"`
 
 	// running simulation limit
 	// Required: true
-	RunningSimulationLimit *int64 `json:"runningSimulationLimit"`
+	RunningSimulationLimit *int32 `json:"runningSimulationLimit"`
+
+	// saas agreement
+	SaasAgreement string `json:"saasAgreement,omitempty"`
+
+	// saas agreement accepted
+	// Required: true
+	SaasAgreementAccepted *bool `json:"saasAgreementAccepted"`
 
 	// state
 	// Required: true
+	// Max Length: 50
+	// Min Length: 0
 	State *string `json:"state"`
-
-	// street
-	// Required: true
-	Street *string `json:"street"`
 }
 
 // Validate validates this organization
 func (m *Organization) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateAcceptedBy(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
 	if err := m.validateActive(formats); err != nil {
 		// prop
 		res = append(res, err)
 	}
 
+	if err := m.validateAddressLine1(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validateAddressLine2(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validateAddressLine3(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
 	if err := m.validateCity(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validateCountry(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validateCreatedBy(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validateFreeTrialHours(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validateLastModifiedBy(formats); err != nil {
 		// prop
 		res = append(res, err)
 	}
@@ -89,12 +169,12 @@ func (m *Organization) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateProductID(formats); err != nil {
+	if err := m.validateRunningSimulationLimit(formats); err != nil {
 		// prop
 		res = append(res, err)
 	}
 
-	if err := m.validateRunningSimulationLimit(formats); err != nil {
+	if err := m.validateSaasAgreementAccepted(formats); err != nil {
 		// prop
 		res = append(res, err)
 	}
@@ -104,14 +184,22 @@ func (m *Organization) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateStreet(formats); err != nil {
-		// prop
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *Organization) validateAcceptedBy(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AcceptedBy) { // not required
+		return nil
+	}
+
+	if err := validate.MaxLength("acceptedBy", "body", string(m.AcceptedBy), 64); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -124,9 +212,120 @@ func (m *Organization) validateActive(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Organization) validateAddressLine1(formats strfmt.Registry) error {
+
+	if err := validate.Required("addressLine1", "body", m.AddressLine1); err != nil {
+		return err
+	}
+
+	if err := validate.MinLength("addressLine1", "body", string(*m.AddressLine1), 0); err != nil {
+		return err
+	}
+
+	if err := validate.MaxLength("addressLine1", "body", string(*m.AddressLine1), 210); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Organization) validateAddressLine2(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AddressLine2) { // not required
+		return nil
+	}
+
+	if err := validate.MinLength("addressLine2", "body", string(*m.AddressLine2), 0); err != nil {
+		return err
+	}
+
+	if err := validate.MaxLength("addressLine2", "body", string(*m.AddressLine2), 210); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Organization) validateAddressLine3(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AddressLine3) { // not required
+		return nil
+	}
+
+	if err := validate.MinLength("addressLine3", "body", string(*m.AddressLine3), 0); err != nil {
+		return err
+	}
+
+	if err := validate.MaxLength("addressLine3", "body", string(*m.AddressLine3), 210); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *Organization) validateCity(formats strfmt.Registry) error {
 
 	if err := validate.Required("city", "body", m.City); err != nil {
+		return err
+	}
+
+	if err := validate.MinLength("city", "body", string(*m.City), 0); err != nil {
+		return err
+	}
+
+	if err := validate.MaxLength("city", "body", string(*m.City), 50); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Organization) validateCountry(formats strfmt.Registry) error {
+
+	if err := validate.Required("country", "body", m.Country); err != nil {
+		return err
+	}
+
+	if err := validate.MinLength("country", "body", string(*m.Country), 0); err != nil {
+		return err
+	}
+
+	if err := validate.MaxLength("country", "body", string(*m.Country), 50); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Organization) validateCreatedBy(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.CreatedBy) { // not required
+		return nil
+	}
+
+	if err := validate.MaxLength("createdBy", "body", string(m.CreatedBy), 64); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Organization) validateFreeTrialHours(formats strfmt.Registry) error {
+
+	if err := validate.Required("freeTrialHours", "body", m.FreeTrialHours); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Organization) validateLastModifiedBy(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.LastModifiedBy) { // not required
+		return nil
+	}
+
+	if err := validate.MaxLength("lastModifiedBy", "body", string(m.LastModifiedBy), 64); err != nil {
 		return err
 	}
 
@@ -139,6 +338,14 @@ func (m *Organization) validateName(formats strfmt.Registry) error {
 		return err
 	}
 
+	if err := validate.MinLength("name", "body", string(*m.Name), 0); err != nil {
+		return err
+	}
+
+	if err := validate.MaxLength("name", "body", string(*m.Name), 100); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -148,12 +355,11 @@ func (m *Organization) validatePostalCode(formats strfmt.Registry) error {
 		return err
 	}
 
-	return nil
-}
+	if err := validate.MinLength("postalCode", "body", string(*m.PostalCode), 0); err != nil {
+		return err
+	}
 
-func (m *Organization) validateProductID(formats strfmt.Registry) error {
-
-	if err := validate.Required("productId", "body", m.ProductID); err != nil {
+	if err := validate.MaxLength("postalCode", "body", string(*m.PostalCode), 50); err != nil {
 		return err
 	}
 
@@ -169,18 +375,26 @@ func (m *Organization) validateRunningSimulationLimit(formats strfmt.Registry) e
 	return nil
 }
 
-func (m *Organization) validateState(formats strfmt.Registry) error {
+func (m *Organization) validateSaasAgreementAccepted(formats strfmt.Registry) error {
 
-	if err := validate.Required("state", "body", m.State); err != nil {
+	if err := validate.Required("saasAgreementAccepted", "body", m.SaasAgreementAccepted); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *Organization) validateStreet(formats strfmt.Registry) error {
+func (m *Organization) validateState(formats strfmt.Registry) error {
 
-	if err := validate.Required("street", "body", m.Street); err != nil {
+	if err := validate.Required("state", "body", m.State); err != nil {
+		return err
+	}
+
+	if err := validate.MinLength("state", "body", string(*m.State), 0); err != nil {
+		return err
+	}
+
+	if err := validate.MaxLength("state", "body", string(*m.State), 50); err != nil {
 		return err
 	}
 

@@ -102,21 +102,13 @@ func NewFindOrganizationByIDUnauthorized() *FindOrganizationByIDUnauthorized {
 Not authorized
 */
 type FindOrganizationByIDUnauthorized struct {
-	Payload *models.Error
 }
 
 func (o *FindOrganizationByIDUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /organizations/{id}][%d] findOrganizationByIdUnauthorized  %+v", 401, o.Payload)
+	return fmt.Sprintf("[GET /organizations/{id}][%d] findOrganizationByIdUnauthorized ", 401)
 }
 
 func (o *FindOrganizationByIDUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
 
 	return nil
 }
@@ -131,21 +123,13 @@ func NewFindOrganizationByIDForbidden() *FindOrganizationByIDForbidden {
 Forbidden
 */
 type FindOrganizationByIDForbidden struct {
-	Payload *models.Error
 }
 
 func (o *FindOrganizationByIDForbidden) Error() string {
-	return fmt.Sprintf("[GET /organizations/{id}][%d] findOrganizationByIdForbidden  %+v", 403, o.Payload)
+	return fmt.Sprintf("[GET /organizations/{id}][%d] findOrganizationByIdForbidden ", 403)
 }
 
 func (o *FindOrganizationByIDForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
 
 	return nil
 }
@@ -160,21 +144,13 @@ func NewFindOrganizationByIDNotFound() *FindOrganizationByIDNotFound {
 Organization not found
 */
 type FindOrganizationByIDNotFound struct {
-	Payload *models.Error
 }
 
 func (o *FindOrganizationByIDNotFound) Error() string {
-	return fmt.Sprintf("[GET /organizations/{id}][%d] findOrganizationByIdNotFound  %+v", 404, o.Payload)
+	return fmt.Sprintf("[GET /organizations/{id}][%d] findOrganizationByIdNotFound ", 404)
 }
 
 func (o *FindOrganizationByIDNotFound) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
 
 	return nil
 }
@@ -192,8 +168,6 @@ unexpected error
 */
 type FindOrganizationByIDDefault struct {
 	_statusCode int
-
-	Payload *models.Error
 }
 
 // Code gets the status code for the find organization by Id default response
@@ -202,17 +176,10 @@ func (o *FindOrganizationByIDDefault) Code() int {
 }
 
 func (o *FindOrganizationByIDDefault) Error() string {
-	return fmt.Sprintf("[GET /organizations/{id}][%d] findOrganizationById default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[GET /organizations/{id}][%d] findOrganizationById default ", o._statusCode)
 }
 
 func (o *FindOrganizationByIDDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
 
 	return nil
 }

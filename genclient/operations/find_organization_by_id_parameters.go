@@ -47,6 +47,15 @@ func NewFindOrganizationByIDParamsWithContext(ctx context.Context) *FindOrganiza
 	}
 }
 
+// NewFindOrganizationByIDParamsWithHTTPClient creates a new FindOrganizationByIDParams object
+// with the default values initialized, and the ability to set a custom HTTPClient for a request
+func NewFindOrganizationByIDParamsWithHTTPClient(client *http.Client) *FindOrganizationByIDParams {
+	var ()
+	return &FindOrganizationByIDParams{
+		HTTPClient: client,
+	}
+}
+
 /*FindOrganizationByIDParams contains all the parameters to send to the API endpoint
 for the find organization by Id operation typically these are written to a http.Request
 */
@@ -56,7 +65,7 @@ type FindOrganizationByIDParams struct {
 	  ID of organization to fetch
 
 	*/
-	ID int64
+	ID int32
 
 	timeout    time.Duration
 	Context    context.Context
@@ -85,25 +94,38 @@ func (o *FindOrganizationByIDParams) SetContext(ctx context.Context) {
 	o.Context = ctx
 }
 
+// WithHTTPClient adds the HTTPClient to the find organization by Id params
+func (o *FindOrganizationByIDParams) WithHTTPClient(client *http.Client) *FindOrganizationByIDParams {
+	o.SetHTTPClient(client)
+	return o
+}
+
+// SetHTTPClient adds the HTTPClient to the find organization by Id params
+func (o *FindOrganizationByIDParams) SetHTTPClient(client *http.Client) {
+	o.HTTPClient = client
+}
+
 // WithID adds the id to the find organization by Id params
-func (o *FindOrganizationByIDParams) WithID(id int64) *FindOrganizationByIDParams {
+func (o *FindOrganizationByIDParams) WithID(id int32) *FindOrganizationByIDParams {
 	o.SetID(id)
 	return o
 }
 
 // SetID adds the id to the find organization by Id params
-func (o *FindOrganizationByIDParams) SetID(id int64) {
+func (o *FindOrganizationByIDParams) SetID(id int32) {
 	o.ID = id
 }
 
 // WriteToRequest writes these params to a swagger request
 func (o *FindOrganizationByIDParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
-	r.SetTimeout(o.timeout)
+	if err := r.SetTimeout(o.timeout); err != nil {
+		return err
+	}
 	var res []error
 
 	// path param id
-	if err := r.SetPathParam("id", swag.FormatInt64(o.ID)); err != nil {
+	if err := r.SetPathParam("id", swag.FormatInt32(o.ID)); err != nil {
 		return err
 	}
 
