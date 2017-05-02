@@ -12,7 +12,7 @@ Additionally, this allows us to automatically generate client code.  The code in
 directory was all generated using the `go-swagger` tools.
 
 
-## Organization
+## Source Code Organization
 * `organization` - the client package that adds convenience methods for common operations
 * `genclient` - the generated client code
 * `models` - the generated models
