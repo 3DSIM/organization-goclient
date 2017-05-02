@@ -47,16 +47,22 @@ func NewGetOrganizationsParamsWithContext(ctx context.Context) *GetOrganizations
 	}
 }
 
+// NewGetOrganizationsParamsWithHTTPClient creates a new GetOrganizationsParams object
+// with the default values initialized, and the ability to set a custom HTTPClient for a request
+func NewGetOrganizationsParamsWithHTTPClient(client *http.Client) *GetOrganizationsParams {
+	var ()
+	return &GetOrganizationsParams{
+		HTTPClient: client,
+	}
+}
+
 /*GetOrganizationsParams contains all the parameters to send to the API endpoint
 for the get organizations operation typically these are written to a http.Request
 */
 type GetOrganizationsParams struct {
 
-	/*Filter
-	  Filter objects based on fields in the object.  E.g. filter=name:my-simulation,state:running
-
-	*/
-	Filter *string
+	/*Active*/
+	Active *bool
 	/*Limit
 	  number of items to return within the query
 
@@ -67,11 +73,6 @@ type GetOrganizationsParams struct {
 
 	*/
 	Offset *int32
-	/*Sort
-	  key:direction pairs for one or multiple field sort orders
-
-	*/
-	Sort []string
 
 	timeout    time.Duration
 	Context    context.Context
@@ -100,15 +101,26 @@ func (o *GetOrganizationsParams) SetContext(ctx context.Context) {
 	o.Context = ctx
 }
 
-// WithFilter adds the filter to the get organizations params
-func (o *GetOrganizationsParams) WithFilter(filter *string) *GetOrganizationsParams {
-	o.SetFilter(filter)
+// WithHTTPClient adds the HTTPClient to the get organizations params
+func (o *GetOrganizationsParams) WithHTTPClient(client *http.Client) *GetOrganizationsParams {
+	o.SetHTTPClient(client)
 	return o
 }
 
-// SetFilter adds the filter to the get organizations params
-func (o *GetOrganizationsParams) SetFilter(filter *string) {
-	o.Filter = filter
+// SetHTTPClient adds the HTTPClient to the get organizations params
+func (o *GetOrganizationsParams) SetHTTPClient(client *http.Client) {
+	o.HTTPClient = client
+}
+
+// WithActive adds the active to the get organizations params
+func (o *GetOrganizationsParams) WithActive(active *bool) *GetOrganizationsParams {
+	o.SetActive(active)
+	return o
+}
+
+// SetActive adds the active to the get organizations params
+func (o *GetOrganizationsParams) SetActive(active *bool) {
+	o.Active = active
 }
 
 // WithLimit adds the limit to the get organizations params
@@ -133,33 +145,24 @@ func (o *GetOrganizationsParams) SetOffset(offset *int32) {
 	o.Offset = offset
 }
 
-// WithSort adds the sort to the get organizations params
-func (o *GetOrganizationsParams) WithSort(sort []string) *GetOrganizationsParams {
-	o.SetSort(sort)
-	return o
-}
-
-// SetSort adds the sort to the get organizations params
-func (o *GetOrganizationsParams) SetSort(sort []string) {
-	o.Sort = sort
-}
-
 // WriteToRequest writes these params to a swagger request
 func (o *GetOrganizationsParams) WriteToRequest(r runtime.ClientRequest, reg strfmt.Registry) error {
 
-	r.SetTimeout(o.timeout)
+	if err := r.SetTimeout(o.timeout); err != nil {
+		return err
+	}
 	var res []error
 
-	if o.Filter != nil {
+	if o.Active != nil {
 
-		// query param filter
-		var qrFilter string
-		if o.Filter != nil {
-			qrFilter = *o.Filter
+		// query param active
+		var qrActive bool
+		if o.Active != nil {
+			qrActive = *o.Active
 		}
-		qFilter := qrFilter
-		if qFilter != "" {
-			if err := r.SetQueryParam("filter", qFilter); err != nil {
+		qActive := swag.FormatBool(qrActive)
+		if qActive != "" {
+			if err := r.SetQueryParam("active", qActive); err != nil {
 				return err
 			}
 		}
@@ -196,14 +199,6 @@ func (o *GetOrganizationsParams) WriteToRequest(r runtime.ClientRequest, reg str
 			}
 		}
 
-	}
-
-	valuesSort := o.Sort
-
-	joinedSort := swag.JoinByFormat(valuesSort, "csv")
-	// query array param sort
-	if err := r.SetQueryParam("sort", joinedSort...); err != nil {
-		return err
 	}
 
 	if len(res) > 0 {

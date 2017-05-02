@@ -1,5 +1,5 @@
 # organization-goclient
-Go client for interacting with the 3DSIM organization api.
+Client for interacting with the organization api
 
 ## Background Info
 We use https://goswagger.io to generate our Go APIs and clients.  This allows
@@ -11,26 +11,42 @@ to generate the server code.
 Additionally, this allows us to automatically generate client code.  The code in this
 directory was all generated using the `go-swagger` tools.
 
-## Organization
 
-* `client` - the generated client code
+## Source Code Organization
+* `organization` - the client package that adds convenience methods for common operations
+* `genclient` - the generated client code
 * `models` - the generated models
 
 ## Regenerating code
+First install the swagger generator.  Currently we are using version 0.10.0 of https://github.com/go-swagger/go-swagger.
 
-The code generator needs a specification file.  The specification for the organization API is stored in `github.com/3dsim/organization-api/swagger/swagger.yaml`.  Assuming that project
+For mac users:
+* brew tap go-swagger/go-swagger
+* brew install go-swagger
+
+For windows users:
+* See https://github.com/go-swagger/go-swagger for options
+
+The code generator needs a specification file.  The specification for the organization API is stored in `github.com/3dsim/organization-api/swagger.yaml`.  Assuming that project
 is cloned as a sibling project, the command to run to generate new client code is:
 ```
-swagger generate client -A OrganizationAPI -f ../organization-api/swagger.yaml
+swagger generate client -A OrganizationAPI -f ../organization-api/swagger.yaml --client-package genclient
 ```
 
-## Using the client and handling authentication
-See `examples_test.go`
+* Generate fakes using counterfeiter
+```
+go get github.com/maxbrunsfeld/counterfeiter
+```
+From inside package folder
+```
+go generate
+```
 
+## Using the client
+TODO
 
 ## Client to API version compatibility
 
 | Organization API | Organization Client |
 | ------------- | ------------- |
-| 0.3.x  | 0.1.x |
-
+| TODO  | TODO |

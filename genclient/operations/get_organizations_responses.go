@@ -93,21 +93,13 @@ func NewGetOrganizationsUnauthorized() *GetOrganizationsUnauthorized {
 Not authorized
 */
 type GetOrganizationsUnauthorized struct {
-	Payload *models.Error
 }
 
 func (o *GetOrganizationsUnauthorized) Error() string {
-	return fmt.Sprintf("[GET /organizations][%d] getOrganizationsUnauthorized  %+v", 401, o.Payload)
+	return fmt.Sprintf("[GET /organizations][%d] getOrganizationsUnauthorized ", 401)
 }
 
 func (o *GetOrganizationsUnauthorized) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
 
 	return nil
 }
@@ -122,21 +114,13 @@ func NewGetOrganizationsForbidden() *GetOrganizationsForbidden {
 Forbidden
 */
 type GetOrganizationsForbidden struct {
-	Payload *models.Error
 }
 
 func (o *GetOrganizationsForbidden) Error() string {
-	return fmt.Sprintf("[GET /organizations][%d] getOrganizationsForbidden  %+v", 403, o.Payload)
+	return fmt.Sprintf("[GET /organizations][%d] getOrganizationsForbidden ", 403)
 }
 
 func (o *GetOrganizationsForbidden) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
 
 	return nil
 }
@@ -154,8 +138,6 @@ unexpected error
 */
 type GetOrganizationsDefault struct {
 	_statusCode int
-
-	Payload *models.Error
 }
 
 // Code gets the status code for the get organizations default response
@@ -164,17 +146,10 @@ func (o *GetOrganizationsDefault) Code() int {
 }
 
 func (o *GetOrganizationsDefault) Error() string {
-	return fmt.Sprintf("[GET /organizations][%d] getOrganizations default  %+v", o._statusCode, o.Payload)
+	return fmt.Sprintf("[GET /organizations][%d] getOrganizations default ", o._statusCode)
 }
 
 func (o *GetOrganizationsDefault) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
-
-	o.Payload = new(models.Error)
-
-	// response payload
-	if err := consumer.Consume(response.Body(), o.Payload); err != nil && err != io.EOF {
-		return err
-	}
 
 	return nil
 }
