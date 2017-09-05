@@ -4,12 +4,15 @@ package organization
 
 import (
 	"fmt"
+	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/3dsim/auth0"
 	"github.com/3dsim/organization-goclient/genclient"
 	"github.com/3dsim/organization-goclient/genclient/operations"
 	"github.com/3dsim/organization-goclient/models"
+	"github.com/PuerkitoBio/rehttp"
 	openapiclient "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 	log "github.com/inconshreveable/log15"
@@ -59,6 +62,22 @@ type client struct {
 //		Prod 	= https://organization.3dsim.com/v2
 // 		Gov 	= https://organization-gov.3dsim.com
 func NewClient(tokenFetcher auth0.TokenFetcher, apiGatewayURL, audience string) Client {
+	return newClient(tokenFetcher, apiGatewayURL, audience, nil, openapiclient.DefaultTimeout)
+}
+
+// NewClientWithRetry creates the same type of client as NewClient, but allows for retrying any temporary errors or
+// any responses with status >= 404 and < 600 for a specified amount of time.
+func NewClientWithRetry(tokenFetcher auth0.TokenFetcher, apiGatewayURL, audience string, retryTimeout time.Duration) Client {
+	tr := rehttp.NewTransport(
+		nil, // will use http.DefaultTransport
+		rehttp.RetryAny(rehttp.RetryStatusInterval(404, 600), rehttp.RetryTemporaryErr()),
+		rehttp.ExpJitterDelay(1*time.Second, retryTimeout),
+	)
+	return newClient(tokenFetcher, apiGatewayURL, audience, tr, retryTimeout)
+}
+
+func newClient(tokenFetcher auth0.TokenFetcher, apiGatewayURL, audience string,
+	roundTripper http.RoundTripper, defaultRequestTimeout time.Duration) Client {
 	parsedURL, err := url.Parse(apiGatewayURL)
 	if err != nil {
 		message := "API Gateway URL was invalid!"
@@ -67,6 +86,10 @@ func NewClient(tokenFetcher auth0.TokenFetcher, apiGatewayURL, audience string) 
 	}
 	organizationTransport := openapiclient.New(parsedURL.Host, OrganizationAPIBasePath, []string{parsedURL.Scheme})
 	organizationTransport.Debug = true
+	if roundTripper != nil {
+		organizationTransport.Transport = roundTripper
+	}
+	openapiclient.DefaultTimeout = defaultRequestTimeout
 	organizationClient := genclient.New(organizationTransport, strfmt.Default)
 	return &client{
 		tokenFetcher: tokenFetcher,
