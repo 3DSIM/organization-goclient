@@ -1,13 +1,13 @@
 package organization
 
 import (
-	"errors"
-	"testing"
-
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
+	"testing"
+	"time"
 
 	"github.com/3dsim/auth0/auth0fakes"
 	"github.com/3dsim/organization-goclient/models"
@@ -208,4 +208,30 @@ func TestOrganizationWhenOrganizationAPIErrorsExpectsErrorReturned(t *testing.T)
 
 	assert.NotNil(t, err, "Expected an error returned because organization api sent a 500 error")
 	assert.Nil(t, response, "Expected response to be nil because organization api sent a 500 error")
+}
+
+func TestNewClientWithRetryWhen500ExpectsRetry(t *testing.T) {
+	// arrange
+	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
+	fakeTokenFetcher.TokenReturns("Token", nil)
+
+	callCounter := 0
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		callCounter++
+		w.WriteHeader(500)
+	})
+
+	// Setup routes
+	r := mux.NewRouter()
+	r.HandleFunc("/"+OrganizationAPIBasePath+"/organizations/1", handler)
+	testServer := httptest.NewServer(r)
+	defer testServer.Close()
+	client := NewClientWithRetry(fakeTokenFetcher, testServer.URL, audience, 3*time.Second)
+
+	// act
+	_, err := client.Organization(1)
+
+	// assert
+	assert.True(t, callCounter > 1, "Expected to retry the failed call at least once")
+	assert.NotNil(t, err, "Expected an error returned because organization api sent a 500 error")
 }

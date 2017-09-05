@@ -1,5 +1,5 @@
-hash: aa9171d433602c5639714c091ec9010c37061879bb267aedd9f5d491894e0f75
-updated: 2017-05-01T15:29:08.259142004-06:00
+hash: d494c1b5a7567b06d25a52d30f100598d8bd995a90274f5db960b2a90310eb83
+updated: 2017-09-05T16:05:02.80576185-06:00
 imports:
 - name: github.com/3dsim/auth0
   version: 3f3ebd1a6c49200c8bffae4a91c4cb06c675347c
@@ -47,6 +47,8 @@ imports:
   version: 30a891c33c7cde7b02a981314b4228ec99380cca
 - name: github.com/PuerkitoBio/purell
   version: 8a290539e2e8629dbc4e6bad948158f790ec31f4
+- name: github.com/PuerkitoBio/rehttp
+  version: 5989d9566be1c6334786e55385219c2b9ab1c4dc
 - name: github.com/PuerkitoBio/urlesc
   version: 5bd2802263f21d8788851d5305584c82a5c75d7e
 - name: golang.org/x/net
