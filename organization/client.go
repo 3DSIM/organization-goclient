@@ -42,6 +42,7 @@ const (
 type Client interface {
 	Organizations() ([]*models.Organization, error)
 	Organization(organizationID int32) (*models.Organization, error)
+	Subscriptions() ([]*models.Subscription, error)
 }
 
 type client struct {
@@ -133,6 +134,26 @@ func (c *client) Organization(organizationID int32) (org *models.Organization, e
 	}
 	params := operations.NewFindOrganizationByIDParams().WithID(organizationID)
 	response, err := c.client.Operations.FindOrganizationByID(params, openapiclient.BearerToken(token))
+	if err != nil {
+		return nil, err
+	}
+	return response.Payload, nil
+}
+
+func (c *client) Subscriptions() (orgList []*models.Subscription, err error) {
+	defer func() {
+		// Until this issue is resolved: https://github.com/go-swagger/go-swagger/issues/1021, we need to recover from
+		// panics.
+		if r := recover(); r != nil {
+			err = fmt.Errorf("Recovered from panic: %v", r)
+		}
+	}()
+	token, err := c.tokenFetcher.Token(c.audience)
+	if err != nil {
+		return nil, err
+	}
+	params := operations.NewGetSubscriptionsParams()
+	response, err := c.client.Operations.GetSubscriptions(params, openapiclient.BearerToken(token))
 	if err != nil {
 		return nil, err
 	}

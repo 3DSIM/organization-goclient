@@ -80,6 +80,35 @@ func (a *Client) GetOrganizations(params *GetOrganizationsParams, authInfo runti
 
 }
 
+/*
+GetSubscriptions Get a list of subscriptions
+*/
+func (a *Client) GetSubscriptions(params *GetSubscriptionsParams, authInfo runtime.ClientAuthInfoWriter) (*GetSubscriptionsOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetSubscriptionsParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "getSubscriptions",
+		Method:             "GET",
+		PathPattern:        "/subscriptions",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetSubscriptionsReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetSubscriptionsOK), nil
+
+}
+
 // SetTransport changes the transport on the client
 func (a *Client) SetTransport(transport runtime.ClientTransport) {
 	a.transport = transport
