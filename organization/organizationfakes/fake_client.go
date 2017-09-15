@@ -44,6 +44,19 @@ type FakeClient struct {
 		result1 []*models.Subscription
 		result2 error
 	}
+	UpdateSubscriptionStub        func(subscription *models.Subscription) (a *models.Subscription, err error)
+	updateSubscriptionMutex       sync.RWMutex
+	updateSubscriptionArgsForCall []struct {
+		subscription *models.Subscription
+	}
+	updateSubscriptionReturns struct {
+		result1 *models.Subscription
+		result2 error
+	}
+	updateSubscriptionReturnsOnCall map[int]struct {
+		result1 *models.Subscription
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -185,6 +198,57 @@ func (fake *FakeClient) SubscriptionsReturnsOnCall(i int, result1 []*models.Subs
 	}{result1, result2}
 }
 
+func (fake *FakeClient) UpdateSubscription(subscription *models.Subscription) (a *models.Subscription, err error) {
+	fake.updateSubscriptionMutex.Lock()
+	ret, specificReturn := fake.updateSubscriptionReturnsOnCall[len(fake.updateSubscriptionArgsForCall)]
+	fake.updateSubscriptionArgsForCall = append(fake.updateSubscriptionArgsForCall, struct {
+		subscription *models.Subscription
+	}{subscription})
+	fake.recordInvocation("UpdateSubscription", []interface{}{subscription})
+	fake.updateSubscriptionMutex.Unlock()
+	if fake.UpdateSubscriptionStub != nil {
+		return fake.UpdateSubscriptionStub(subscription)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.updateSubscriptionReturns.result1, fake.updateSubscriptionReturns.result2
+}
+
+func (fake *FakeClient) UpdateSubscriptionCallCount() int {
+	fake.updateSubscriptionMutex.RLock()
+	defer fake.updateSubscriptionMutex.RUnlock()
+	return len(fake.updateSubscriptionArgsForCall)
+}
+
+func (fake *FakeClient) UpdateSubscriptionArgsForCall(i int) *models.Subscription {
+	fake.updateSubscriptionMutex.RLock()
+	defer fake.updateSubscriptionMutex.RUnlock()
+	return fake.updateSubscriptionArgsForCall[i].subscription
+}
+
+func (fake *FakeClient) UpdateSubscriptionReturns(result1 *models.Subscription, result2 error) {
+	fake.UpdateSubscriptionStub = nil
+	fake.updateSubscriptionReturns = struct {
+		result1 *models.Subscription
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeClient) UpdateSubscriptionReturnsOnCall(i int, result1 *models.Subscription, result2 error) {
+	fake.UpdateSubscriptionStub = nil
+	if fake.updateSubscriptionReturnsOnCall == nil {
+		fake.updateSubscriptionReturnsOnCall = make(map[int]struct {
+			result1 *models.Subscription
+			result2 error
+		})
+	}
+	fake.updateSubscriptionReturnsOnCall[i] = struct {
+		result1 *models.Subscription
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -194,6 +258,8 @@ func (fake *FakeClient) Invocations() map[string][][]interface{} {
 	defer fake.organizationMutex.RUnlock()
 	fake.subscriptionsMutex.RLock()
 	defer fake.subscriptionsMutex.RUnlock()
+	fake.updateSubscriptionMutex.RLock()
+	defer fake.updateSubscriptionMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
