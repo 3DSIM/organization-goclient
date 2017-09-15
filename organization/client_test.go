@@ -235,3 +235,188 @@ func TestNewClientWithRetryWhen500ExpectsRetry(t *testing.T) {
 	assert.True(t, callCounter > 1, "Expected to retry the failed call at least once")
 	assert.NotNil(t, err, "Expected an error returned because organization api sent a 500 error")
 }
+
+func TestSubscriptionsWhenSuccessfulExpectsSubscriptionsListReturned(t *testing.T) {
+	// arrange
+	// Token
+	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
+	fakeTokenFetcher.TokenReturns("Token", nil)
+
+	// Subscription
+	listToReturn := []*models.Subscription{
+		&models.Subscription{
+			ID: 1,
+		},
+		&models.Subscription{
+			ID: 2,
+		},
+	}
+
+	subscriptionHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		assert.NotEmpty(t, r.Header.Get("Authorization"), "Authorization header should not be empty")
+		bytes, err := json.Marshal(listToReturn)
+		if err != nil {
+			t.Error("Failed to marshal organization list")
+		}
+		w.Write(bytes)
+	})
+
+	// Setup routes
+	r := mux.NewRouter()
+	subscriptionsEndpoint := "/" + OrganizationAPIBasePath + "/subscriptions"
+	r.HandleFunc(subscriptionsEndpoint, subscriptionHandler)
+	testServer := httptest.NewServer(r)
+	defer testServer.Close()
+	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+
+	// act
+	list, err := client.Subscriptions()
+
+	// assert
+	assert.Nil(t, err, "Expected no error returned")
+	assert.NotNil(t, list, "Expected returned organization list to not be nil")
+	assert.Equal(t, len(listToReturn), len(list), "Expected organization list length to match reference list length")
+	assert.Equal(t, int32(1), listToReturn[0].ID, "Expected IDs to match")
+}
+
+func TestSubscriptionsWhenTokenFetcherErrorsExpectsErrorReturned(t *testing.T) {
+	// arrange
+	expectedError := errors.New("Some auth0 error")
+
+	// Token
+	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
+	fakeTokenFetcher.TokenReturns("", expectedError)
+
+	client := NewClient(fakeTokenFetcher, "apiGatewayURL", audience)
+
+	// act
+	list, err := client.Subscriptions()
+
+	// assert
+
+	assert.Equal(t, expectedError, err, "Expected an error returned")
+	assert.Nil(t, list, "Expected list of organizations to be nil")
+}
+
+func TestSubscriptionsWhenOrganizationAPIErrorsExpectsErrorReturned(t *testing.T) {
+	// arrange
+	// Token
+	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
+	fakeTokenFetcher.TokenReturns("Token", nil)
+
+	// Organization
+	subscriptionHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(500)
+	})
+
+	// Setup routes
+	r := mux.NewRouter()
+	subscriptionEndpoint := "/" + OrganizationAPIBasePath + "/subscriptions"
+	r.HandleFunc(subscriptionEndpoint, subscriptionHandler)
+	testServer := httptest.NewServer(r)
+	defer testServer.Close()
+	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+
+	// act
+	list, err := client.Subscriptions()
+
+	// assert
+
+	assert.NotNil(t, err, "Expected an error returned because organization api send a 500 error")
+	assert.Nil(t, list, "Expected list of organizations to be nil")
+}
+
+func TestUpdateSubscriptionWhenSuccessfulExpectsSubscriptionReturned(t *testing.T) {
+	// arrange
+	// Token
+	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
+	fakeTokenFetcher.TokenReturns("Token", nil)
+
+	// Subscription
+	subscription := &models.Subscription{
+		ID:             1,
+		OrganizationID: 1,
+	}
+
+	subscriptionHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		assert.NotEmpty(t, r.Header.Get("Authorization"), "Authorization header should not be empty")
+		bytes, err := json.Marshal(subscription)
+		if err != nil {
+			t.Error("Failed to marshal organization list")
+		}
+		w.Write(bytes)
+	})
+
+	// Setup routes
+	r := mux.NewRouter()
+	subscriptionsEndpoint := "/" + OrganizationAPIBasePath + "/organizations/1/subscriptions/1"
+	r.HandleFunc(subscriptionsEndpoint, subscriptionHandler)
+	testServer := httptest.NewServer(r)
+	defer testServer.Close()
+	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+
+	// act
+	subResponse, err := client.UpdateSubscription(subscription)
+
+	// assert
+	assert.Nil(t, err, "Expected no error returned")
+	assert.NotNil(t, subResponse, "Expected subResponse to not be nil")
+	assert.Equal(t, int32(1), subResponse.ID, "Expected IDs to match")
+}
+
+func TestUpdateSubscriptionWhenTokenFetcherErrorsExpectsErrorReturned(t *testing.T) {
+	// arrange
+	expectedError := errors.New("Some auth0 error")
+	subscription := &models.Subscription{
+		ID:             1,
+		OrganizationID: 1,
+	}
+	// Token
+	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
+	fakeTokenFetcher.TokenReturns("", expectedError)
+
+	client := NewClient(fakeTokenFetcher, "apiGatewayURL", audience)
+
+	// act
+	subResponse, err := client.UpdateSubscription(subscription)
+
+	// assert
+
+	assert.Equal(t, expectedError, err, "Expected an error returned")
+	assert.Nil(t, subResponse, "Expected subResponse to be nil")
+}
+
+func TestUpdateSubscriptionWhenOrganizationAPIErrorsExpectsErrorReturned(t *testing.T) {
+	// arrange
+	subscription := &models.Subscription{
+		ID:             1,
+		OrganizationID: 1,
+	}
+
+	// Token
+	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
+	fakeTokenFetcher.TokenReturns("Token", nil)
+
+	// Organization
+	subscriptionHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(500)
+	})
+
+	// Setup routes
+	r := mux.NewRouter()
+	subscriptionEndpoint := "/" + OrganizationAPIBasePath + "/organizations/1/subscriptions/1"
+	r.HandleFunc(subscriptionEndpoint, subscriptionHandler)
+	testServer := httptest.NewServer(r)
+	defer testServer.Close()
+	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+
+	// act
+	subResponse, err := client.UpdateSubscription(subscription)
+
+	// assert
+
+	assert.NotNil(t, err, "Expected an error returned because organization api send a 500 error")
+	assert.Nil(t, subResponse, "Expected subResponse to be nil")
+}
