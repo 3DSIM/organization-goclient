@@ -57,6 +57,32 @@ type FakeClient struct {
 		result1 *models.Subscription
 		result2 error
 	}
+	PlanStub        func(planID int32) (org *models.Plan, err error)
+	planMutex       sync.RWMutex
+	planArgsForCall []struct {
+		planID int32
+	}
+	planReturns struct {
+		result1 *models.Plan
+		result2 error
+	}
+	planReturnsOnCall map[int]struct {
+		result1 *models.Plan
+		result2 error
+	}
+	OrganizationUsersStub        func(organizationID int32) (users []*models.User, err error)
+	organizationUsersMutex       sync.RWMutex
+	organizationUsersArgsForCall []struct {
+		organizationID int32
+	}
+	organizationUsersReturns struct {
+		result1 []*models.User
+		result2 error
+	}
+	organizationUsersReturnsOnCall map[int]struct {
+		result1 []*models.User
+		result2 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -249,6 +275,108 @@ func (fake *FakeClient) UpdateSubscriptionReturnsOnCall(i int, result1 *models.S
 	}{result1, result2}
 }
 
+func (fake *FakeClient) Plan(planID int32) (org *models.Plan, err error) {
+	fake.planMutex.Lock()
+	ret, specificReturn := fake.planReturnsOnCall[len(fake.planArgsForCall)]
+	fake.planArgsForCall = append(fake.planArgsForCall, struct {
+		planID int32
+	}{planID})
+	fake.recordInvocation("Plan", []interface{}{planID})
+	fake.planMutex.Unlock()
+	if fake.PlanStub != nil {
+		return fake.PlanStub(planID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.planReturns.result1, fake.planReturns.result2
+}
+
+func (fake *FakeClient) PlanCallCount() int {
+	fake.planMutex.RLock()
+	defer fake.planMutex.RUnlock()
+	return len(fake.planArgsForCall)
+}
+
+func (fake *FakeClient) PlanArgsForCall(i int) int32 {
+	fake.planMutex.RLock()
+	defer fake.planMutex.RUnlock()
+	return fake.planArgsForCall[i].planID
+}
+
+func (fake *FakeClient) PlanReturns(result1 *models.Plan, result2 error) {
+	fake.PlanStub = nil
+	fake.planReturns = struct {
+		result1 *models.Plan
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeClient) PlanReturnsOnCall(i int, result1 *models.Plan, result2 error) {
+	fake.PlanStub = nil
+	if fake.planReturnsOnCall == nil {
+		fake.planReturnsOnCall = make(map[int]struct {
+			result1 *models.Plan
+			result2 error
+		})
+	}
+	fake.planReturnsOnCall[i] = struct {
+		result1 *models.Plan
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeClient) OrganizationUsers(organizationID int32) (users []*models.User, err error) {
+	fake.organizationUsersMutex.Lock()
+	ret, specificReturn := fake.organizationUsersReturnsOnCall[len(fake.organizationUsersArgsForCall)]
+	fake.organizationUsersArgsForCall = append(fake.organizationUsersArgsForCall, struct {
+		organizationID int32
+	}{organizationID})
+	fake.recordInvocation("OrganizationUsers", []interface{}{organizationID})
+	fake.organizationUsersMutex.Unlock()
+	if fake.OrganizationUsersStub != nil {
+		return fake.OrganizationUsersStub(organizationID)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fake.organizationUsersReturns.result1, fake.organizationUsersReturns.result2
+}
+
+func (fake *FakeClient) OrganizationUsersCallCount() int {
+	fake.organizationUsersMutex.RLock()
+	defer fake.organizationUsersMutex.RUnlock()
+	return len(fake.organizationUsersArgsForCall)
+}
+
+func (fake *FakeClient) OrganizationUsersArgsForCall(i int) int32 {
+	fake.organizationUsersMutex.RLock()
+	defer fake.organizationUsersMutex.RUnlock()
+	return fake.organizationUsersArgsForCall[i].organizationID
+}
+
+func (fake *FakeClient) OrganizationUsersReturns(result1 []*models.User, result2 error) {
+	fake.OrganizationUsersStub = nil
+	fake.organizationUsersReturns = struct {
+		result1 []*models.User
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeClient) OrganizationUsersReturnsOnCall(i int, result1 []*models.User, result2 error) {
+	fake.OrganizationUsersStub = nil
+	if fake.organizationUsersReturnsOnCall == nil {
+		fake.organizationUsersReturnsOnCall = make(map[int]struct {
+			result1 []*models.User
+			result2 error
+		})
+	}
+	fake.organizationUsersReturnsOnCall[i] = struct {
+		result1 []*models.User
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -260,6 +388,10 @@ func (fake *FakeClient) Invocations() map[string][][]interface{} {
 	defer fake.subscriptionsMutex.RUnlock()
 	fake.updateSubscriptionMutex.RLock()
 	defer fake.updateSubscriptionMutex.RUnlock()
+	fake.planMutex.RLock()
+	defer fake.planMutex.RUnlock()
+	fake.organizationUsersMutex.RLock()
+	defer fake.organizationUsersMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
