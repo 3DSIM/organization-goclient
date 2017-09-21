@@ -57,6 +57,9 @@ type Subscription struct {
 
 	// trial end
 	TrialEnd strfmt.DateTime `json:"trialEnd,omitempty"`
+
+	// warning email sent at
+	WarningEmailSentAt strfmt.DateTime `json:"warningEmailSentAt,omitempty"`
 }
 
 // Validate validates this subscription
