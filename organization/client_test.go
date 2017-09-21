@@ -560,7 +560,7 @@ func TestOrganizationUsersWhenSuccessfulExpectsUserListReturned(t *testing.T) {
 	assert.Nil(t, err, "Expected no error returned")
 	assert.NotNil(t, list, "Expected returned organization list to not be nil")
 	assert.Equal(t, len(listToReturn), len(list), "Expected organization list length to match reference list length")
-	assert.Equal(t, "User 1", listToReturn[0].FirstName, "Expected IDs to match")
+	assert.Equal(t, "User 1", listToReturn[0].FirstName, "Expected Names to match")
 }
 
 func TestOrganizationUsersWhenTokenFetcherErrorsExpectsErrorReturned(t *testing.T) {

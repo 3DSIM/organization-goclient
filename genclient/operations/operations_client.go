@@ -85,7 +85,7 @@ func (a *Client) GetOrganizations(params *GetOrganizationsParams, authInfo runti
 /*
 GetPlan Get plan by id
 */
-func (a *Client) GetPlan(params *GetPlanParams, authInfo runtime.ClientAuthInfoWriter) (*GetPlanOK, error) {
+func (a *Client) GetPlan(params *GetPlanParams) (*GetPlanOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
 		params = NewGetPlanParams()
@@ -100,7 +100,6 @@ func (a *Client) GetPlan(params *GetPlanParams, authInfo runtime.ClientAuthInfoW
 		Schemes:            []string{"http"},
 		Params:             params,
 		Reader:             &GetPlanReader{formats: a.formats},
-		AuthInfo:           authInfo,
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	})

@@ -64,7 +64,7 @@ for the get plan operation typically these are written to a http.Request
 type GetPlanParams struct {
 
 	/*ID
-	  ID of organization to fetch
+	  ID of plan to fetch
 
 	*/
 	ID int32
