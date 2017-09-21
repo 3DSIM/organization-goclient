@@ -436,7 +436,6 @@ func TestPlanWhenSuccessfulExpectsPlanReturned(t *testing.T) {
 	}
 	planHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		assert.NotEmpty(t, r.Header.Get("Authorization"), "Authorization header should not be empty")
 		receivedPlanID, err := strconv.Atoi(mux.Vars(r)["planID"])
 		if err != nil {
 			t.Fatal(err)
@@ -466,25 +465,6 @@ func TestPlanWhenSuccessfulExpectsPlanReturned(t *testing.T) {
 	assert.NotNil(t, plan, "Expected returned plan to not be nil")
 	assert.Equal(t, *planToReturn.Name, *plan.Name, "Expected names to match")
 	assert.Equal(t, planToReturn.ID, plan.ID, "Expected IDs to match")
-}
-
-func TestPlanWhenTokenFetcherErrorsExpectsErrorReturned(t *testing.T) {
-	// arrange
-	planID := int32(2)
-	expectedError := errors.New("Some auth0 error")
-
-	// Token
-	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
-	fakeTokenFetcher.TokenReturns("", expectedError)
-
-	client := NewClient(fakeTokenFetcher, "apiGatewayURL", audience)
-
-	// act
-	response, err := client.Plan(planID)
-
-	// assert
-	assert.Nil(t, response, "Expected response to be nil because token fetcher returned error")
-	assert.Equal(t, expectedError, err, "Expected an error returned")
 }
 
 func TestPlanWhenOrganizationAPIErrorsExpectsErrorReturned(t *testing.T) {
