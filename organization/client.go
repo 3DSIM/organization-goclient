@@ -192,12 +192,8 @@ func (c *client) Plan(planID int32) (plan *models.Plan, err error) {
 		}
 	}()
 
-	token, err := c.tokenFetcher.Token(c.audience)
-	if err != nil {
-		return nil, err
-	}
 	params := operations.NewGetPlanParams().WithID(planID)
-	response, err := c.client.Operations.GetPlan(params, openapiclient.BearerToken(token))
+	response, err := c.client.Operations.GetPlan(params)
 	if err != nil {
 		return nil, err
 	}
