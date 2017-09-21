@@ -420,3 +420,195 @@ func TestUpdateSubscriptionWhenOrganizationAPIErrorsExpectsErrorReturned(t *test
 	assert.NotNil(t, err, "Expected an error returned because organization api send a 500 error")
 	assert.Nil(t, subResponse, "Expected subResponse to be nil")
 }
+
+func TestPlanWhenSuccessfulExpectsPlanReturned(t *testing.T) {
+	// arrange
+	planID := int32(2)
+
+	// Token
+	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
+	fakeTokenFetcher.TokenReturns("Token", nil)
+
+	// Organization
+	planToReturn := &models.Plan{
+		ID:   planID,
+		Name: swag.String("Plan name"),
+	}
+	planHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		assert.NotEmpty(t, r.Header.Get("Authorization"), "Authorization header should not be empty")
+		receivedPlanID, err := strconv.Atoi(mux.Vars(r)["planID"])
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.EqualValues(t, int(planID), receivedPlanID, "Expected plan id received to match what was passed in")
+		bytes, err := json.Marshal(planToReturn)
+		if err != nil {
+			t.Error("Failed to marshal organization")
+		}
+		w.Write(bytes)
+	})
+
+	// Setup routes
+	r := mux.NewRouter()
+	planEndpoint := "/" + OrganizationAPIBasePath + "/plans/{planID}"
+	r.HandleFunc(planEndpoint, planHandler)
+	testServer := httptest.NewServer(r)
+	defer testServer.Close()
+	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+
+	// act
+	plan, err := client.Plan(planID)
+
+	// assert
+
+	assert.Nil(t, err, "Expected no error returned")
+	assert.NotNil(t, plan, "Expected returned plan to not be nil")
+	assert.Equal(t, *planToReturn.Name, *plan.Name, "Expected names to match")
+	assert.Equal(t, planToReturn.ID, plan.ID, "Expected IDs to match")
+}
+
+func TestPlanWhenTokenFetcherErrorsExpectsErrorReturned(t *testing.T) {
+	// arrange
+	planID := int32(2)
+	expectedError := errors.New("Some auth0 error")
+
+	// Token
+	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
+	fakeTokenFetcher.TokenReturns("", expectedError)
+
+	client := NewClient(fakeTokenFetcher, "apiGatewayURL", audience)
+
+	// act
+	response, err := client.Plan(planID)
+
+	// assert
+	assert.Nil(t, response, "Expected response to be nil because token fetcher returned error")
+	assert.Equal(t, expectedError, err, "Expected an error returned")
+}
+
+func TestPlanWhenOrganizationAPIErrorsExpectsErrorReturned(t *testing.T) {
+	// arrange
+	planID := int32(2)
+
+	// Token
+	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
+	fakeTokenFetcher.TokenReturns("Token", nil)
+
+	// Organization
+	planHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(500)
+	})
+
+	// Setup routes
+	r := mux.NewRouter()
+	planEndpoint := "/" + OrganizationAPIBasePath + "/plans/{planID}"
+	r.HandleFunc(planEndpoint, planHandler)
+	testServer := httptest.NewServer(r)
+	defer testServer.Close()
+	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+
+	// act
+	response, err := client.Plan(planID)
+
+	// assert
+
+	assert.NotNil(t, err, "Expected an error returned because organization api sent a 500 error")
+	assert.Nil(t, response, "Expected response to be nil because organization api sent a 500 error")
+}
+
+func TestOrganizationUsersWhenSuccessfulExpectsUserListReturned(t *testing.T) {
+	// arrange
+	orgID := int32(1)
+
+	// Token
+	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
+	fakeTokenFetcher.TokenReturns("Token", nil)
+
+	// Organization
+	listToReturn := []*models.User{
+		&models.User{
+			FirstName: "User 1",
+		},
+		&models.User{
+			FirstName: "User 2",
+		},
+	}
+
+	organizationHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		assert.NotEmpty(t, r.Header.Get("Authorization"), "Authorization header should not be empty")
+		bytes, err := json.Marshal(listToReturn)
+		if err != nil {
+			t.Error("Failed to marshal organization list")
+		}
+		w.Write(bytes)
+	})
+
+	// Setup routes
+	r := mux.NewRouter()
+	organizationUserEndpoint := "/" + OrganizationAPIBasePath + "/organizations/{orgId}/users"
+	r.HandleFunc(organizationUserEndpoint, organizationHandler)
+	testServer := httptest.NewServer(r)
+	defer testServer.Close()
+	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+
+	// act
+	list, err := client.OrganizationUsers(orgID)
+
+	// assert
+	assert.Nil(t, err, "Expected no error returned")
+	assert.NotNil(t, list, "Expected returned organization list to not be nil")
+	assert.Equal(t, len(listToReturn), len(list), "Expected organization list length to match reference list length")
+	assert.Equal(t, "User 1", listToReturn[0].FirstName, "Expected Names to match")
+}
+
+func TestOrganizationUsersWhenTokenFetcherErrorsExpectsErrorReturned(t *testing.T) {
+	// arrange
+	orgID := int32(2)
+	expectedError := errors.New("Some auth0 error")
+
+	// Token
+	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
+	fakeTokenFetcher.TokenReturns("", expectedError)
+
+	client := NewClient(fakeTokenFetcher, "apiGatewayURL", audience)
+
+	// act
+	list, err := client.OrganizationUsers(orgID)
+
+	// assert
+
+	assert.Equal(t, expectedError, err, "Expected an error returned")
+	assert.Nil(t, list, "Expected list of organizations to be nil")
+}
+
+func TestOrganizationUsersWhenOrganizationAPIErrorsExpectsErrorReturned(t *testing.T) {
+	// arrange
+	orgID := int32(2)
+
+	// Token
+	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
+	fakeTokenFetcher.TokenReturns("Token", nil)
+
+	// Organization
+	organizationHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(500)
+	})
+
+	// Setup routes
+	r := mux.NewRouter()
+	organizationEndpoint := "/" + OrganizationAPIBasePath + "/organizations/{orgID}/users"
+	r.HandleFunc(organizationEndpoint, organizationHandler)
+	testServer := httptest.NewServer(r)
+	defer testServer.Close()
+	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+
+	// act
+	list, err := client.OrganizationUsers(orgID)
+
+	// assert
+
+	assert.NotNil(t, err, "Expected an error returned because organization api send a 500 error")
+	assert.Nil(t, list, "Expected list of organizations to be nil")
+}

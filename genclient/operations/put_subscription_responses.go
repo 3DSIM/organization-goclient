@@ -65,7 +65,7 @@ func NewPutSubscriptionOK() *PutSubscriptionOK {
 
 /*PutSubscriptionOK handles this case with default header values.
 
-Successfully returned the list of items
+Successfully returned subscription
 */
 type PutSubscriptionOK struct {
 	Payload *models.Subscription

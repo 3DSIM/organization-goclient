@@ -44,6 +44,8 @@ type Client interface {
 	Organization(organizationID int32) (*models.Organization, error)
 	Subscriptions() ([]*models.Subscription, error)
 	UpdateSubscription(subscription *models.Subscription) (a *models.Subscription, err error)
+	Plan(planID int32) (org *models.Plan, err error)
+	OrganizationUsers(organizationID int32) (users []*models.User, err error)
 }
 
 type client struct {
@@ -175,6 +177,48 @@ func (c *client) UpdateSubscription(subscription *models.Subscription) (a *model
 	}
 	params := operations.NewPutSubscriptionParams().WithOrgID(subscription.OrganizationID).WithSubID(subscription.ID).WithSubscription(subscription)
 	response, err := c.client.Operations.PutSubscription(params, openapiclient.BearerToken(token))
+	if err != nil {
+		return nil, err
+	}
+	return response.Payload, nil
+}
+
+func (c *client) Plan(planID int32) (plan *models.Plan, err error) {
+	defer func() {
+		// Until this issue is resolved: https://github.com/go-swagger/go-swagger/issues/1021, we need to recover from
+		// panics.
+		if r := recover(); r != nil {
+			err = fmt.Errorf("Recovered from panic: %v", r)
+		}
+	}()
+
+	token, err := c.tokenFetcher.Token(c.audience)
+	if err != nil {
+		return nil, err
+	}
+	params := operations.NewGetPlanParams().WithID(planID)
+	response, err := c.client.Operations.GetPlan(params, openapiclient.BearerToken(token))
+	if err != nil {
+		return nil, err
+	}
+	return response.Payload, nil
+}
+
+func (c *client) OrganizationUsers(organizationID int32) (users []*models.User, err error) {
+	defer func() {
+		// Until this issue is resolved: https://github.com/go-swagger/go-swagger/issues/1021, we need to recover from
+		// panics.
+		if r := recover(); r != nil {
+			err = fmt.Errorf("Recovered from panic: %v", r)
+		}
+	}()
+
+	token, err := c.tokenFetcher.Token(c.audience)
+	if err != nil {
+		return nil, err
+	}
+	params := operations.NewGetUsersByOrganizationParams().WithID(organizationID)
+	response, err := c.client.Operations.GetUsersByOrganization(params, openapiclient.BearerToken(token))
 	if err != nil {
 		return nil, err
 	}

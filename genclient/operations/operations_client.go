@@ -83,6 +83,34 @@ func (a *Client) GetOrganizations(params *GetOrganizationsParams, authInfo runti
 }
 
 /*
+GetPlan Get plan by id
+*/
+func (a *Client) GetPlan(params *GetPlanParams) (*GetPlanOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetPlanParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "getPlan",
+		Method:             "GET",
+		PathPattern:        "/plans/{id}",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetPlanReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetPlanOK), nil
+
+}
+
+/*
 GetSubscriptions Get a list of subscriptions
 */
 func (a *Client) GetSubscriptions(params *GetSubscriptionsParams, authInfo runtime.ClientAuthInfoWriter) (*GetSubscriptionsOK, error) {
@@ -108,6 +136,35 @@ func (a *Client) GetSubscriptions(params *GetSubscriptionsParams, authInfo runti
 		return nil, err
 	}
 	return result.(*GetSubscriptionsOK), nil
+
+}
+
+/*
+GetUsersByOrganization Returns list of users for organization
+*/
+func (a *Client) GetUsersByOrganization(params *GetUsersByOrganizationParams, authInfo runtime.ClientAuthInfoWriter) (*GetUsersByOrganizationOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetUsersByOrganizationParams()
+	}
+
+	result, err := a.transport.Submit(&runtime.ClientOperation{
+		ID:                 "getUsersByOrganization",
+		Method:             "GET",
+		PathPattern:        "/organizations/{id}/users",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetUsersByOrganizationReader{formats: a.formats},
+		AuthInfo:           authInfo,
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return result.(*GetUsersByOrganizationOK), nil
 
 }
 
