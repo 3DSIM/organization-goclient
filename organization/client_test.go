@@ -257,7 +257,7 @@ func TestSubscriptionsWhenSuccessfulExpectsSubscriptionsListReturned(t *testing.
 		assert.NotEmpty(t, r.Header.Get("Authorization"), "Authorization header should not be empty")
 		bytes, err := json.Marshal(listToReturn)
 		if err != nil {
-			t.Error("Failed to marshal organization list")
+			t.Error("Failed to marshal subscription list")
 		}
 		w.Write(bytes)
 	})
@@ -271,7 +271,7 @@ func TestSubscriptionsWhenSuccessfulExpectsSubscriptionsListReturned(t *testing.
 	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
 
 	// act
-	list, err := client.Subscriptions()
+	list, err := client.Subscriptions(nil)
 
 	// assert
 	assert.Nil(t, err, "Expected no error returned")
@@ -291,7 +291,7 @@ func TestSubscriptionsWhenTokenFetcherErrorsExpectsErrorReturned(t *testing.T) {
 	client := NewClient(fakeTokenFetcher, "apiGatewayURL", audience)
 
 	// act
-	list, err := client.Subscriptions()
+	list, err := client.Subscriptions(nil)
 
 	// assert
 
@@ -319,7 +319,7 @@ func TestSubscriptionsWhenOrganizationAPIErrorsExpectsErrorReturned(t *testing.T
 	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
 
 	// act
-	list, err := client.Subscriptions()
+	list, err := client.Subscriptions(nil)
 
 	// assert
 

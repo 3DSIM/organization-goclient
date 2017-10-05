@@ -42,7 +42,7 @@ const (
 type Client interface {
 	Organizations() ([]*models.Organization, error)
 	Organization(organizationID int32) (*models.Organization, error)
-	Subscriptions() ([]*models.Subscription, error)
+	Subscriptions(limit *int32) ([]*models.Subscription, error)
 	UpdateSubscription(subscription *models.Subscription) (a *models.Subscription, err error)
 	Plan(planID int32) (org *models.Plan, err error)
 	OrganizationUsers(organizationID int32) (users []*models.User, err error)
@@ -143,7 +143,7 @@ func (c *client) Organization(organizationID int32) (org *models.Organization, e
 	return response.Payload, nil
 }
 
-func (c *client) Subscriptions() (subscriptionList []*models.Subscription, err error) {
+func (c *client) Subscriptions(limit *int32) (subscriptionList []*models.Subscription, err error) {
 	defer func() {
 		// Until this issue is resolved: https://github.com/go-swagger/go-swagger/issues/1021, we need to recover from
 		// panics.
@@ -156,6 +156,9 @@ func (c *client) Subscriptions() (subscriptionList []*models.Subscription, err e
 		return nil, err
 	}
 	params := operations.NewGetSubscriptionsParams()
+	if limit != nil {
+		params.SetLimit(limit)
+	}
 	response, err := c.client.Operations.GetSubscriptions(params, openapiclient.BearerToken(token))
 	if err != nil {
 		return nil, err
