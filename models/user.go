@@ -41,7 +41,7 @@ type User struct {
 	LastIPAddress string `json:"lastIpAddress,omitempty"`
 
 	// last login
-	LastLogin strfmt.DateTime `json:"lastLogin,omitempty"`
+	LastLogin *strfmt.DateTime `json:"lastLogin,omitempty"`
 
 	// last name
 	LastName string `json:"lastName,omitempty"`
@@ -53,7 +53,7 @@ type User struct {
 	Picture string `json:"picture,omitempty"`
 
 	// updated at
-	UpdatedAt strfmt.DateTime `json:"updatedAt,omitempty"`
+	UpdatedAt *strfmt.DateTime `json:"updatedAt,omitempty"`
 
 	// user Id
 	UserID string `json:"userId,omitempty"`

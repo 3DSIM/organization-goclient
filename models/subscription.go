@@ -56,10 +56,10 @@ type Subscription struct {
 	PlanID int32 `json:"planId,omitempty"`
 
 	// trial end
-	TrialEnd strfmt.DateTime `json:"trialEnd,omitempty"`
+	TrialEnd *strfmt.DateTime `json:"trialEnd,omitempty"`
 
 	// warning email sent at
-	WarningEmailSentAt strfmt.DateTime `json:"warningEmailSentAt,omitempty"`
+	WarningEmailSentAt *strfmt.DateTime `json:"warningEmailSentAt,omitempty"`
 }
 
 // Validate validates this subscription
