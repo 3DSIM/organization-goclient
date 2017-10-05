@@ -33,10 +33,12 @@ type FakeClient struct {
 		result1 *models.Organization
 		result2 error
 	}
-	SubscriptionsStub        func() ([]*models.Subscription, error)
+	SubscriptionsStub        func(limit *int32) ([]*models.Subscription, error)
 	subscriptionsMutex       sync.RWMutex
-	subscriptionsArgsForCall []struct{}
-	subscriptionsReturns     struct {
+	subscriptionsArgsForCall []struct {
+		limit *int32
+	}
+	subscriptionsReturns struct {
 		result1 []*models.Subscription
 		result2 error
 	}
@@ -181,14 +183,16 @@ func (fake *FakeClient) OrganizationReturnsOnCall(i int, result1 *models.Organiz
 	}{result1, result2}
 }
 
-func (fake *FakeClient) Subscriptions() ([]*models.Subscription, error) {
+func (fake *FakeClient) Subscriptions(limit *int32) ([]*models.Subscription, error) {
 	fake.subscriptionsMutex.Lock()
 	ret, specificReturn := fake.subscriptionsReturnsOnCall[len(fake.subscriptionsArgsForCall)]
-	fake.subscriptionsArgsForCall = append(fake.subscriptionsArgsForCall, struct{}{})
-	fake.recordInvocation("Subscriptions", []interface{}{})
+	fake.subscriptionsArgsForCall = append(fake.subscriptionsArgsForCall, struct {
+		limit *int32
+	}{limit})
+	fake.recordInvocation("Subscriptions", []interface{}{limit})
 	fake.subscriptionsMutex.Unlock()
 	if fake.SubscriptionsStub != nil {
-		return fake.SubscriptionsStub()
+		return fake.SubscriptionsStub(limit)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
@@ -200,6 +204,12 @@ func (fake *FakeClient) SubscriptionsCallCount() int {
 	fake.subscriptionsMutex.RLock()
 	defer fake.subscriptionsMutex.RUnlock()
 	return len(fake.subscriptionsArgsForCall)
+}
+
+func (fake *FakeClient) SubscriptionsArgsForCall(i int) *int32 {
+	fake.subscriptionsMutex.RLock()
+	defer fake.subscriptionsMutex.RUnlock()
+	return fake.subscriptionsArgsForCall[i].limit
 }
 
 func (fake *FakeClient) SubscriptionsReturns(result1 []*models.Subscription, result2 error) {
