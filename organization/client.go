@@ -194,9 +194,12 @@ func (c *client) Plan(planID int32) (plan *models.Plan, err error) {
 			err = fmt.Errorf("Recovered from panic: %v", r)
 		}
 	}()
-
+	token, err := c.tokenFetcher.Token(c.audience)
+	if err != nil {
+		return nil, err
+	}
 	params := operations.NewGetPlanParams().WithID(planID)
-	response, err := c.client.Operations.GetPlan(params)
+	response, err := c.client.Operations.GetPlan(params, openapiclient.BearerToken(token))
 	if err != nil {
 		return nil, err
 	}
