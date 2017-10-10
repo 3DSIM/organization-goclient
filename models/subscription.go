@@ -41,6 +41,13 @@ type Subscription struct {
 	// id
 	ID int32 `json:"id,omitempty"`
 
+	// last modified at
+	LastModifiedAt *strfmt.DateTime `json:"lastModifiedAt,omitempty"`
+
+	// last modified by
+	// Max Length: 64
+	LastModifiedBy string `json:"lastModifiedBy,omitempty"`
+
 	// organization Id
 	OrganizationID int32 `json:"organizationId,omitempty"`
 
@@ -71,6 +78,11 @@ func (m *Subscription) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateLastModifiedBy(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
 	if err := m.validatePaymentMethod(formats); err != nil {
 		// prop
 		res = append(res, err)
@@ -94,6 +106,19 @@ func (m *Subscription) validateCanceledBy(formats strfmt.Registry) error {
 	}
 
 	if err := validate.MaxLength("canceledBy", "body", string(m.CanceledBy), 64); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Subscription) validateLastModifiedBy(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.LastModifiedBy) { // not required
+		return nil
+	}
+
+	if err := validate.MaxLength("lastModifiedBy", "body", string(m.LastModifiedBy), 64); err != nil {
 		return err
 	}
 
