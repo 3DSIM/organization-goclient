@@ -6,10 +6,14 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+	"strconv"
+
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // Auth0Organization auth0 organization
@@ -41,10 +45,38 @@ func (m *Auth0Organization) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
+var auth0OrganizationRolesItemsEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["Admin","User","SuperAdmin"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		auth0OrganizationRolesItemsEnum = append(auth0OrganizationRolesItemsEnum, v)
+	}
+}
+
+func (m *Auth0Organization) validateRolesItemsEnum(path, location string, value string) error {
+	if err := validate.Enum(path, location, value, auth0OrganizationRolesItemsEnum); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (m *Auth0Organization) validateRoles(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.Roles) { // not required
 		return nil
+	}
+
+	for i := 0; i < len(m.Roles); i++ {
+
+		// value enum
+		if err := m.validateRolesItemsEnum("roles"+"."+strconv.Itoa(i), "body", m.Roles[i]); err != nil {
+			return err
+		}
+
 	}
 
 	return nil
