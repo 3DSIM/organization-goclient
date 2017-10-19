@@ -1,6 +1,11 @@
 # organization-goclient
 Client for interacting with the organization api
 
+## Technical Specifications
+
+### Platforms Supported
+MacOS, Windows, and Linux
+
 ## Background Info
 We use https://goswagger.io to generate our Go APIs and clients.  This allows
 us to build our APIs in a "design first" manner.
@@ -50,3 +55,14 @@ TODO
 | Organization API | Organization Client |
 | ------------- | ------------- |
 | TODO  | TODO |
+
+## Team
+* Tim Sublette
+* Ryan Walls
+* Chad Queen
+* Pete Krull
+* Alex Drinkwater
+
+## Original release
+January 2017
+
