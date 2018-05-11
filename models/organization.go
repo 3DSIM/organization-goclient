@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"strconv"
+
 	strfmt "github.com/go-openapi/strfmt"
 
 	"github.com/go-openapi/errors"
@@ -43,6 +45,9 @@ type Organization struct {
 	// Max Length: 210
 	// Min Length: 0
 	AddressLine3 *string `json:"addressLine3,omitempty"`
+
+	// allow new UI
+	AllowNewUI bool `json:"allowNewUI,omitempty"`
 
 	// city
 	// Required: true
@@ -83,6 +88,10 @@ type Organization struct {
 	// Min Length: 0
 	Name *string `json:"name"`
 
+	// payment processor customer Id
+	// Max Length: 128
+	PaymentProcessorCustomerID string `json:"paymentProcessorCustomerId,omitempty"`
+
 	// postal code
 	// Required: true
 	// Max Length: 50
@@ -105,6 +114,9 @@ type Organization struct {
 	// Max Length: 50
 	// Min Length: 0
 	State *string `json:"state"`
+
+	// subscriptions
+	Subscriptions []*Subscription `json:"subscriptions"`
 }
 
 // Validate validates this organization
@@ -166,6 +178,11 @@ func (m *Organization) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validatePaymentProcessorCustomerID(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
 	if err := m.validatePostalCode(formats); err != nil {
 		// prop
 		res = append(res, err)
@@ -182,6 +199,11 @@ func (m *Organization) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateState(formats); err != nil {
+		// prop
+		res = append(res, err)
+	}
+
+	if err := m.validateSubscriptions(formats); err != nil {
 		// prop
 		res = append(res, err)
 	}
@@ -351,6 +373,19 @@ func (m *Organization) validateName(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *Organization) validatePaymentProcessorCustomerID(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.PaymentProcessorCustomerID) { // not required
+		return nil
+	}
+
+	if err := validate.MaxLength("paymentProcessorCustomerId", "body", string(m.PaymentProcessorCustomerID), 128); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *Organization) validatePostalCode(formats strfmt.Registry) error {
 
 	if err := validate.Required("postalCode", "body", m.PostalCode); err != nil {
@@ -398,6 +433,33 @@ func (m *Organization) validateState(formats strfmt.Registry) error {
 
 	if err := validate.MaxLength("state", "body", string(*m.State), 50); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (m *Organization) validateSubscriptions(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Subscriptions) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Subscriptions); i++ {
+
+		if swag.IsZero(m.Subscriptions[i]) { // not required
+			continue
+		}
+
+		if m.Subscriptions[i] != nil {
+
+			if err := m.Subscriptions[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("subscriptions" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
