@@ -49,7 +49,7 @@ var auth0OrganizationRolesItemsEnum []interface{}
 
 func init() {
 	var res []string
-	if err := json.Unmarshal([]byte(`["Admin","User","SuperAdmin"]`), &res); err != nil {
+	if err := json.Unmarshal([]byte(`["Admin","User","SuperAdmin","AccountManager"]`), &res); err != nil {
 		panic(err)
 	}
 	for _, v := range res {
