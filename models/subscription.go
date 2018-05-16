@@ -23,7 +23,7 @@ type Subscription struct {
 	Active bool `json:"active,omitempty"`
 
 	// canceled at
-	CanceledAt strfmt.DateTime `json:"canceledAt,omitempty"`
+	CanceledAt *strfmt.DateTime `json:"canceledAt,omitempty"`
 
 	// canceled by
 	// Max Length: 64
