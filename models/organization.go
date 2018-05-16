@@ -20,7 +20,7 @@ import (
 type Organization struct {
 
 	// accepted at
-	AcceptedAt strfmt.DateTime `json:"acceptedAt,omitempty"`
+	AcceptedAt *strfmt.DateTime `json:"acceptedAt,omitempty"`
 
 	// accepted by
 	// Max Length: 64
