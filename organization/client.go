@@ -31,11 +31,6 @@ func init() {
 	Log.SetHandler(log.DiscardHandler())
 }
 
-const (
-	// OrganizationAPIBasePath is the base path or "slug" for the organization api
-	OrganizationAPIBasePath = "organization-api"
-)
-
 // Client is a wrapper around the generated client found in the "genclient" package.  It provides convenience methods
 // for common operations.  If the operation needed is not found in Client, use the "genclient" package using this client
 // as an example of how to utilize the genclient.  PRs are welcome if more functionality is wanted in this client package.
@@ -57,30 +52,35 @@ type client struct {
 // NewClient creates a new client for interacting with the 3DSIM organization api.  See the auth0 package for how to construct
 // the token fetcher.  The apiGatewayURL's are as follows:
 //
-// 		QA 				= https://3dsim-qa.cloud.tyk.io
-//		Prod and Gov 	= https://3dsim.cloud.tyk.io
+// 		QA (AWS & Azure) = https://3dsim-qa.cloud.tyk.io
+//		Prod and Gov 	 = https://3dsim.cloud.tyk.io
+//
+// The apiBasePath's are as follows:
+// 		QA (AWS), Prod and Gov = organization-api
+//		QA (Azure) = azure-organization-api
 //
 // The audience's are:
 //
-// 		QA 		= https://organization-qa.3dsim.com/v2
-//		Prod 	= https://organization.3dsim.com/v2
-// 		Gov 	= https://organization-gov.3dsim.com
-func NewClient(tokenFetcher auth0.TokenFetcher, apiGatewayURL, audience string) Client {
-	return newClient(tokenFetcher, apiGatewayURL, audience, nil, openapiclient.DefaultTimeout)
+// 		QA (AWS)	= https://organization-qa.3dsim.com/v2
+// 		QA (Azure)	= https://organization-qa.ansys-additive.com
+//		Prod 		= https://organization.3dsim.com/v2
+// 		Gov 		= https://organization-gov.3dsim.com
+func NewClient(tokenFetcher auth0.TokenFetcher, apiGatewayURL, apiBasePath, audience string) Client {
+	return newClient(tokenFetcher, apiGatewayURL, apiBasePath, audience, nil, openapiclient.DefaultTimeout)
 }
 
 // NewClientWithRetry creates the same type of client as NewClient, but allows for retrying any temporary errors or
 // any responses with status >= 400 and < 600 for a specified amount of time.
-func NewClientWithRetry(tokenFetcher auth0.TokenFetcher, apiGatewayURL, audience string, retryTimeout time.Duration) Client {
+func NewClientWithRetry(tokenFetcher auth0.TokenFetcher, apiGatewayURL, apiBasePath, audience string, retryTimeout time.Duration) Client {
 	tr := rehttp.NewTransport(
 		nil, // will use http.DefaultTransport
 		rehttp.RetryAny(rehttp.RetryStatusInterval(400, 600), rehttp.RetryTemporaryErr()),
 		rehttp.ExpJitterDelay(1*time.Second, retryTimeout),
 	)
-	return newClient(tokenFetcher, apiGatewayURL, audience, tr, retryTimeout)
+	return newClient(tokenFetcher, apiGatewayURL, apiBasePath, audience, tr, retryTimeout)
 }
 
-func newClient(tokenFetcher auth0.TokenFetcher, apiGatewayURL, audience string,
+func newClient(tokenFetcher auth0.TokenFetcher, apiGatewayURL, apiBasePath, audience string,
 	roundTripper http.RoundTripper, defaultRequestTimeout time.Duration) Client {
 	parsedURL, err := url.Parse(apiGatewayURL)
 	if err != nil {
@@ -88,7 +88,7 @@ func newClient(tokenFetcher auth0.TokenFetcher, apiGatewayURL, audience string,
 		Log.Error(message, "apiGatewayURL", apiGatewayURL)
 		panic(message + " " + err.Error())
 	}
-	organizationTransport := openapiclient.New(parsedURL.Host, OrganizationAPIBasePath, []string{parsedURL.Scheme})
+	organizationTransport := openapiclient.New(parsedURL.Host, apiBasePath, []string{parsedURL.Scheme})
 	organizationTransport.Debug = true
 	if roundTripper != nil {
 		organizationTransport.Transport = roundTripper

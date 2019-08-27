@@ -17,7 +17,8 @@ import (
 )
 
 const (
-	audience = "test audience"
+	apiBasePath = "base-path"
+	audience    = "test audience"
 )
 
 func TestOrganizationsWhenSuccessfulExpectsOrganizationListReturned(t *testing.T) {
@@ -50,11 +51,11 @@ func TestOrganizationsWhenSuccessfulExpectsOrganizationListReturned(t *testing.T
 
 	// Setup routes
 	r := mux.NewRouter()
-	organizationEndpoint := "/" + OrganizationAPIBasePath + "/organizations"
+	organizationEndpoint := "/" + apiBasePath + "/organizations"
 	r.HandleFunc(organizationEndpoint, organizationHandler)
 	testServer := httptest.NewServer(r)
 	defer testServer.Close()
-	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+	client := NewClient(fakeTokenFetcher, testServer.URL, apiBasePath, audience)
 
 	// act
 	list, err := client.Organizations()
@@ -75,7 +76,7 @@ func TestOrganizationsWhenTokenFetcherErrorsExpectsErrorReturned(t *testing.T) {
 	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
 	fakeTokenFetcher.TokenReturns("", expectedError)
 
-	client := NewClient(fakeTokenFetcher, "apiGatewayURL", audience)
+	client := NewClient(fakeTokenFetcher, "apiGatewayURL", apiBasePath, audience)
 
 	// act
 	list, err := client.Organizations()
@@ -99,11 +100,11 @@ func TestOrganizationsWhenOrganizationAPIErrorsExpectsErrorReturned(t *testing.T
 
 	// Setup routes
 	r := mux.NewRouter()
-	organizationEndpoint := "/" + OrganizationAPIBasePath + "/organizations"
+	organizationEndpoint := "/" + apiBasePath + "/organizations"
 	r.HandleFunc(organizationEndpoint, organizationHandler)
 	testServer := httptest.NewServer(r)
 	defer testServer.Close()
-	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+	client := NewClient(fakeTokenFetcher, testServer.URL, apiBasePath, audience)
 
 	// act
 	list, err := client.Organizations()
@@ -144,11 +145,11 @@ func TestOrganizationWhenSuccessfulExpectsOrganizationReturned(t *testing.T) {
 
 	// Setup routes
 	r := mux.NewRouter()
-	organizationEndpoint := "/" + OrganizationAPIBasePath + "/organizations/{organizationID}"
+	organizationEndpoint := "/" + apiBasePath + "/organizations/{organizationID}"
 	r.HandleFunc(organizationEndpoint, organizationHandler)
 	testServer := httptest.NewServer(r)
 	defer testServer.Close()
-	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+	client := NewClient(fakeTokenFetcher, testServer.URL, apiBasePath, audience)
 
 	// act
 	organization, err := client.Organization(organizationID)
@@ -170,7 +171,7 @@ func TestOrganizationWhenTokenFetcherErrorsExpectsErrorReturned(t *testing.T) {
 	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
 	fakeTokenFetcher.TokenReturns("", expectedError)
 
-	client := NewClient(fakeTokenFetcher, "apiGatewayURL", audience)
+	client := NewClient(fakeTokenFetcher, "apiGatewayURL", apiBasePath, audience)
 
 	// act
 	response, err := client.Organization(organizationID)
@@ -195,11 +196,11 @@ func TestOrganizationWhenOrganizationAPIErrorsExpectsErrorReturned(t *testing.T)
 
 	// Setup routes
 	r := mux.NewRouter()
-	organizationEndpoint := "/" + OrganizationAPIBasePath + "/organizations/{organizationID}"
+	organizationEndpoint := "/" + apiBasePath + "/organizations/{organizationID}"
 	r.HandleFunc(organizationEndpoint, organizationHandler)
 	testServer := httptest.NewServer(r)
 	defer testServer.Close()
-	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+	client := NewClient(fakeTokenFetcher, testServer.URL, apiBasePath, audience)
 
 	// act
 	response, err := client.Organization(organizationID)
@@ -223,10 +224,10 @@ func TestNewClientWithRetryWhen500ExpectsRetry(t *testing.T) {
 
 	// Setup routes
 	r := mux.NewRouter()
-	r.HandleFunc("/"+OrganizationAPIBasePath+"/organizations/1", handler)
+	r.HandleFunc("/"+apiBasePath+"/organizations/1", handler)
 	testServer := httptest.NewServer(r)
 	defer testServer.Close()
-	client := NewClientWithRetry(fakeTokenFetcher, testServer.URL, audience, 3*time.Second)
+	client := NewClientWithRetry(fakeTokenFetcher, testServer.URL, apiBasePath, audience, 3*time.Second)
 
 	// act
 	_, err := client.Organization(1)
@@ -264,11 +265,11 @@ func TestSubscriptionsWhenSuccessfulExpectsSubscriptionsListReturned(t *testing.
 
 	// Setup routes
 	r := mux.NewRouter()
-	subscriptionsEndpoint := "/" + OrganizationAPIBasePath + "/subscriptions"
+	subscriptionsEndpoint := "/" + apiBasePath + "/subscriptions"
 	r.HandleFunc(subscriptionsEndpoint, subscriptionHandler)
 	testServer := httptest.NewServer(r)
 	defer testServer.Close()
-	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+	client := NewClient(fakeTokenFetcher, testServer.URL, apiBasePath, audience)
 
 	// act
 	list, err := client.Subscriptions(nil)
@@ -288,7 +289,7 @@ func TestSubscriptionsWhenTokenFetcherErrorsExpectsErrorReturned(t *testing.T) {
 	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
 	fakeTokenFetcher.TokenReturns("", expectedError)
 
-	client := NewClient(fakeTokenFetcher, "apiGatewayURL", audience)
+	client := NewClient(fakeTokenFetcher, "apiGatewayURL", apiBasePath, audience)
 
 	// act
 	list, err := client.Subscriptions(nil)
@@ -312,11 +313,11 @@ func TestSubscriptionsWhenOrganizationAPIErrorsExpectsErrorReturned(t *testing.T
 
 	// Setup routes
 	r := mux.NewRouter()
-	subscriptionEndpoint := "/" + OrganizationAPIBasePath + "/subscriptions"
+	subscriptionEndpoint := "/" + apiBasePath + "/subscriptions"
 	r.HandleFunc(subscriptionEndpoint, subscriptionHandler)
 	testServer := httptest.NewServer(r)
 	defer testServer.Close()
-	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+	client := NewClient(fakeTokenFetcher, testServer.URL, apiBasePath, audience)
 
 	// act
 	list, err := client.Subscriptions(nil)
@@ -351,11 +352,11 @@ func TestUpdateSubscriptionWhenSuccessfulExpectsSubscriptionReturned(t *testing.
 
 	// Setup routes
 	r := mux.NewRouter()
-	subscriptionsEndpoint := "/" + OrganizationAPIBasePath + "/organizations/1/subscriptions/1"
+	subscriptionsEndpoint := "/" + apiBasePath + "/organizations/1/subscriptions/1"
 	r.HandleFunc(subscriptionsEndpoint, subscriptionHandler)
 	testServer := httptest.NewServer(r)
 	defer testServer.Close()
-	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+	client := NewClient(fakeTokenFetcher, testServer.URL, apiBasePath, audience)
 
 	// act
 	subResponse, err := client.UpdateSubscription(subscription)
@@ -377,7 +378,7 @@ func TestUpdateSubscriptionWhenTokenFetcherErrorsExpectsErrorReturned(t *testing
 	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
 	fakeTokenFetcher.TokenReturns("", expectedError)
 
-	client := NewClient(fakeTokenFetcher, "apiGatewayURL", audience)
+	client := NewClient(fakeTokenFetcher, "apiGatewayURL", apiBasePath, audience)
 
 	// act
 	subResponse, err := client.UpdateSubscription(subscription)
@@ -406,11 +407,11 @@ func TestUpdateSubscriptionWhenOrganizationAPIErrorsExpectsErrorReturned(t *test
 
 	// Setup routes
 	r := mux.NewRouter()
-	subscriptionEndpoint := "/" + OrganizationAPIBasePath + "/organizations/1/subscriptions/1"
+	subscriptionEndpoint := "/" + apiBasePath + "/organizations/1/subscriptions/1"
 	r.HandleFunc(subscriptionEndpoint, subscriptionHandler)
 	testServer := httptest.NewServer(r)
 	defer testServer.Close()
-	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+	client := NewClient(fakeTokenFetcher, testServer.URL, apiBasePath, audience)
 
 	// act
 	subResponse, err := client.UpdateSubscription(subscription)
@@ -450,11 +451,11 @@ func TestPlanWhenSuccessfulExpectsPlanReturned(t *testing.T) {
 
 	// Setup routes
 	r := mux.NewRouter()
-	planEndpoint := "/" + OrganizationAPIBasePath + "/plans/{planID}"
+	planEndpoint := "/" + apiBasePath + "/plans/{planID}"
 	r.HandleFunc(planEndpoint, planHandler)
 	testServer := httptest.NewServer(r)
 	defer testServer.Close()
-	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+	client := NewClient(fakeTokenFetcher, testServer.URL, apiBasePath, audience)
 
 	// act
 	plan, err := client.Plan(planID)
@@ -482,11 +483,11 @@ func TestPlanWhenOrganizationAPIErrorsExpectsErrorReturned(t *testing.T) {
 
 	// Setup routes
 	r := mux.NewRouter()
-	planEndpoint := "/" + OrganizationAPIBasePath + "/plans/{planID}"
+	planEndpoint := "/" + apiBasePath + "/plans/{planID}"
 	r.HandleFunc(planEndpoint, planHandler)
 	testServer := httptest.NewServer(r)
 	defer testServer.Close()
-	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+	client := NewClient(fakeTokenFetcher, testServer.URL, apiBasePath, audience)
 
 	// act
 	response, err := client.Plan(planID)
@@ -527,11 +528,11 @@ func TestOrganizationUsersWhenSuccessfulExpectsUserListReturned(t *testing.T) {
 
 	// Setup routes
 	r := mux.NewRouter()
-	organizationUserEndpoint := "/" + OrganizationAPIBasePath + "/organizations/{orgId}/users"
+	organizationUserEndpoint := "/" + apiBasePath + "/organizations/{orgId}/users"
 	r.HandleFunc(organizationUserEndpoint, organizationHandler)
 	testServer := httptest.NewServer(r)
 	defer testServer.Close()
-	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+	client := NewClient(fakeTokenFetcher, testServer.URL, apiBasePath, audience)
 
 	// act
 	list, err := client.OrganizationUsers(orgID)
@@ -552,7 +553,7 @@ func TestOrganizationUsersWhenTokenFetcherErrorsExpectsErrorReturned(t *testing.
 	fakeTokenFetcher := &auth0fakes.FakeTokenFetcher{}
 	fakeTokenFetcher.TokenReturns("", expectedError)
 
-	client := NewClient(fakeTokenFetcher, "apiGatewayURL", audience)
+	client := NewClient(fakeTokenFetcher, "apiGatewayURL", apiBasePath, audience)
 
 	// act
 	list, err := client.OrganizationUsers(orgID)
@@ -578,11 +579,11 @@ func TestOrganizationUsersWhenOrganizationAPIErrorsExpectsErrorReturned(t *testi
 
 	// Setup routes
 	r := mux.NewRouter()
-	organizationEndpoint := "/" + OrganizationAPIBasePath + "/organizations/{orgID}/users"
+	organizationEndpoint := "/" + apiBasePath + "/organizations/{orgID}/users"
 	r.HandleFunc(organizationEndpoint, organizationHandler)
 	testServer := httptest.NewServer(r)
 	defer testServer.Close()
-	client := NewClient(fakeTokenFetcher, testServer.URL, audience)
+	client := NewClient(fakeTokenFetcher, testServer.URL, apiBasePath, audience)
 
 	// act
 	list, err := client.OrganizationUsers(orgID)
